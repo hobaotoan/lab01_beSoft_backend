@@ -66,24 +66,27 @@ $ npm run test:cov
 ```
 
 ## Tutorial
-nest new nestgraphql
 
-cd nestgraphql
+1. nest new nestgraphql
 
-npm i --save @nestjs/graphql apollo-server-express graphql-tools graphql @nestjs/mongoose mongoose type-graphql
+2. cd nestgraphql
+
+3. npm i --save @nestjs/graphql apollo-server-express graphql-tools graphql @nestjs/mongoose mongoose type-graphql
 
 
-nest g module items
-nest g service items
-nest g resolver items
+4. nest g module items
+5. nest g service items
+6. nest g resolver items
+
 
 in items folder add the following:
 
 
-add createitem.dto.ts
-add item.interface.ts
-add inputitems.input.ts
-add item.schema.ts
+1. add createitem.dto.ts
+2. add item.interface.ts
+3. add inputitems.input.ts
+4. add item.schema.ts
+5. add item.graphql
 
 
 ### update AppModule and import GraphQLModule
