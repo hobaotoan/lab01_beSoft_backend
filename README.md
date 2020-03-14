@@ -31,20 +31,25 @@
 ## Installation
 
 ```bash
+$ git clone https://github.com/Bouabidi/nestgraphql.git
+```
+```bash
+$ cd nestgraphql
+```
+
+```bash
 $ npm install
 ```
 
 ## Running the app
 
 ```bash
-# development
-$ npm run start
+# start Mongodb
+```
 
-# watch mode
+```bash
+# open a terminal and run the server
 $ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
 ## Test
@@ -60,16 +65,187 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Support
+## Tutorial
+nest new nestgraphql
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+cd nestgraphql
 
-## Stay in touch
+npm i --save @nestjs/graphql apollo-server-express graphql-tools graphql @nestjs/mongoose mongoose type-graphql
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
 
-## License
+nest g module items
+nest g service items
+nest g resolver items
 
-  Nest is [MIT licensed](LICENSE).
+add createitem.dto.ts
+add item.interface.ts
+add inputitems.input.ts
+add item.schema.ts
+
+
+update AppModule and import GraphQLModule
+
+import { GraphQLModule } from '@nestjs/graphql';
+@Module({
+ imports: [
+  GraphQLModule.forRoot({
+   autoSchemaFile: 'schema.gql',
+  })]
+export class AppModule {}
+
+
+add the connection to the database by importing MongooseModule
+
+import { MongooseModule } from '@nestjs/mongoose';
+
+@Module({
+ imports: [
+  MongooseModule.forRoot('mongodb://localhost/nestgraphql')
+ ],
+})
+export class AppModule {}
+
+update item.schema.ts
+
+import * as mongoose from 'mongoose';
+
+export const ItemSchema = new mongoose.Schema({
+ title: String,
+ price: Number,
+ description: String,
+});
+
+
+update item.interface.ts
+
+import { Document } from 'mongoose';
+
+export interface Item extends Document {
+ readonly title: string;
+ readonly price: number;
+ readonly description: string;
+}
+
+update createitem.dto.ts 
+import { ObjectType, Field, Int, ID } from 'type-graphql';
+
+@ObjectType()
+export class ItemType {
+  @Field(() => ID)
+  readonly id?: string;
+  @Field()
+  readonly title: string;
+  @Field(() => Int)
+  readonly price: number;
+  @Field()
+  readonly description: string;
+}
+
+update inputitems.input.ts
+
+import { InputType, Field, Int } from 'type-graphql';
+
+@InputType()
+export class ItemInput {
+  @Field()
+  readonly title: string;
+  @Field(() => Int)
+  readonly price: number;
+  @Field()
+  readonly description: string;
+}
+
+create database:
+import our schema into ItemsModule
+
+@Module({
+ imports: [MongooseModule.forFeature([{ name: 'Item', schema: ItemSchema }])],
+providers: [ItemsResolver, ItemsService],
+})
+export class ItemsModule {}
+
+
+implement crud with GraphQL
+
+--first create crud functionality 
+there for we will update our service
+we will import the database model and implement functionality using
+Mongodb functions.
+
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { ItemType } from './dto/create-item.dto';
+import { Item } from './interfaces/item.interface';
+import { ItemInput } from './input-items.input';
+
+@Injectable()
+export class ItemsService {
+  constructor(@InjectModel('Item') private itemModel: Model<Item>) {}
+
+  async create(createItemDto: ItemInput): Promise<ItemType> {
+    const createdItem = new this.itemModel(createItemDto);
+    return await createdItem.save();
+  }
+
+  async findAll(): Promise<ItemType[]> {
+    return await this.itemModel.find().exec();
+  }
+
+  async findOne(id: string): Promise<ItemType> {
+    return await this.itemModel.findOne({ _id: id });
+  }
+
+  async delete(id: string): Promise<ItemType> {
+    return await this.itemModel.findByIdAndRemove(id);
+  }
+
+  async update(id: string, item: Item): Promise<ItemType> {
+    return await this.itemModel.findByIdAndUpdate(id, item, { new: true });
+  }
+}
+
+---resolver
+now we can implement our Resolver. Resolver can be seen as a controller 
+in a crud functionality without GraphQL.
+Querys and Mutations will be defined.
+
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { ItemsService } from './items.service';
+import { ItemType } from './dto/create-item.dto';
+import { ItemInput } from './input-items.input';
+
+@Resolver()
+export class ItemsResolver {
+  constructor(private readonly itemsService: ItemsService) {}
+
+  @Query(() => [ItemType])
+  async items(): Promise<ItemType[]> {
+    return this.itemsService.findAll();
+  }
+
+  @Mutation(() => ItemType)
+  async createItem(@Args('input') input: ItemInput): Promise<ItemInput> {
+    return this.itemsService.create(input);
+  }
+
+  @Mutation(() => ItemType)
+  async updateItem(
+    @Args('id') id: string,
+    @Args('input') input: ItemInput,
+  ): Promise<ItemInput> {
+    return this.itemsService.update(id, input);
+  }
+
+  @Mutation(() => ItemType)
+  async deleteItem(@Args('id') id: string): Promise<ItemInput> {
+    return this.itemsService.delete(id);
+  }
+
+  @Query(() => String)
+  async hello() {
+    return 'hello';
+  }
+}
+ 
+
