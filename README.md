@@ -272,4 +272,34 @@ export class ItemsResolver {
   }
 }
 ```
+---item.graphql
+update the file 
+```javascript
+input ItemInput {
+  title: String!
+  price: Int!
+  description: String!
+}
+
+type ItemType {
+  id: ID!
+  title: String!
+  price: Int!
+  description: String!
+}
+
+type Mutation {
+  createItem(input: ItemInput!): ItemType!
+  updateItem(input: ItemInput!, id: String!): ItemType!
+  deleteItem(id: String!): ItemType!
+}
+
+type Query {
+  items: [ItemType!]!
+  hello: String!
+}
+
+```
+
+
 
