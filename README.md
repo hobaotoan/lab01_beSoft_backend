@@ -77,13 +77,18 @@ nest g module items
 nest g service items
 nest g resolver items
 
+in items folder add the following:
+
+
 add createitem.dto.ts
 add item.interface.ts
 add inputitems.input.ts
 add item.schema.ts
 
 
-update AppModule and import GraphQLModule
+# update AppModule and import GraphQLModule
+
+```javascript
 
 import { GraphQLModule } from '@nestjs/graphql';
 @Module({
@@ -92,10 +97,11 @@ import { GraphQLModule } from '@nestjs/graphql';
    autoSchemaFile: 'schema.gql',
   })]
 export class AppModule {}
+```
 
+# add the connection to the database by importing MongooseModule
 
-add the connection to the database by importing MongooseModule
-
+```javascript
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
@@ -104,9 +110,11 @@ import { MongooseModule } from '@nestjs/mongoose';
  ],
 })
 export class AppModule {}
+```
 
-update item.schema.ts
+# update item.schema.ts
 
+```javascript
 import * as mongoose from 'mongoose';
 
 export const ItemSchema = new mongoose.Schema({
@@ -114,10 +122,12 @@ export const ItemSchema = new mongoose.Schema({
  price: Number,
  description: String,
 });
+```
+
+# update item.interface.ts
 
 
-update item.interface.ts
-
+```javascript
 import { Document } from 'mongoose';
 
 export interface Item extends Document {
@@ -125,8 +135,11 @@ export interface Item extends Document {
  readonly price: number;
  readonly description: string;
 }
+```
 
-update createitem.dto.ts 
+# update createitem.dto.ts 
+
+```javascript
 import { ObjectType, Field, Int, ID } from 'type-graphql';
 
 @ObjectType()
@@ -140,8 +153,11 @@ export class ItemType {
   @Field()
   readonly description: string;
 }
+```
 
-update inputitems.input.ts
+# update inputitems.input.ts
+
+```javascript
 
 import { InputType, Field, Int } from 'type-graphql';
 
@@ -154,24 +170,27 @@ export class ItemInput {
   @Field()
   readonly description: string;
 }
+```
 
-create database:
+# create database:
+
+
 import our schema into ItemsModule
-
+```javascript
 @Module({
  imports: [MongooseModule.forFeature([{ name: 'Item', schema: ItemSchema }])],
 providers: [ItemsResolver, ItemsService],
 })
 export class ItemsModule {}
+```
 
-
-implement crud with GraphQL
+# implement crud with GraphQL
 
 --first create crud functionality 
 there for we will update our service
-we will import the database model and implement functionality using
-Mongodb functions.
+we will import the database model and implement functionality using Mongodb functions.
 
+```javascript
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -204,12 +223,14 @@ export class ItemsService {
     return await this.itemModel.findByIdAndUpdate(id, item, { new: true });
   }
 }
+```
 
 ---resolver
 now we can implement our Resolver. Resolver can be seen as a controller 
 in a crud functionality without GraphQL.
 Querys and Mutations will be defined.
 
+```javascript
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { ItemsService } from './items.service';
 import { ItemType } from './dto/create-item.dto';
@@ -247,5 +268,5 @@ export class ItemsResolver {
     return 'hello';
   }
 }
- 
+```
 
