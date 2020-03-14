@@ -86,7 +86,7 @@ add inputitems.input.ts
 add item.schema.ts
 
 
-# update AppModule and import GraphQLModule
+### update AppModule and import GraphQLModule
 
 ```javascript
 
@@ -99,7 +99,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 export class AppModule {}
 ```
 
-# add the connection to the database by importing MongooseModule
+### add the connection to the database by importing MongooseModule
 
 ```javascript
 import { MongooseModule } from '@nestjs/mongoose';
@@ -112,7 +112,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 export class AppModule {}
 ```
 
-# update item.schema.ts
+### update item.schema.ts
 
 ```javascript
 import * as mongoose from 'mongoose';
@@ -124,7 +124,7 @@ export const ItemSchema = new mongoose.Schema({
 });
 ```
 
-# update item.interface.ts
+### update item.interface.ts
 
 
 ```javascript
@@ -137,7 +137,7 @@ export interface Item extends Document {
 }
 ```
 
-# update createitem.dto.ts 
+### update createitem.dto.ts 
 
 ```javascript
 import { ObjectType, Field, Int, ID } from 'type-graphql';
@@ -155,7 +155,7 @@ export class ItemType {
 }
 ```
 
-# update inputitems.input.ts
+### update inputitems.input.ts
 
 ```javascript
 
@@ -172,7 +172,7 @@ export class ItemInput {
 }
 ```
 
-# create database:
+### create database:
 
 
 import our schema into ItemsModule
@@ -184,7 +184,7 @@ providers: [ItemsResolver, ItemsService],
 export class ItemsModule {}
 ```
 
-# implement crud with GraphQL
+### implement crud with GraphQL
 
 --first create crud functionality 
 there for we will update our service
