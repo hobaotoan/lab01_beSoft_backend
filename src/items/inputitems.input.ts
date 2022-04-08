@@ -3,9 +3,11 @@ import { InputType, Field, Int } from 'type-graphql';
 @InputType()
 export class ItemInput {
     @Field()
-    readonly title: string;
-    @Field(() => Int)
-    readonly price: number;
+    readonly username: string;
     @Field()
-    readonly description: string;
+    readonly password: string;
+    @Field()
+    readonly email: string;
+    @Field()
+    readonly phone: string;
 }

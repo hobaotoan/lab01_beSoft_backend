@@ -13,6 +13,13 @@ export class ItemsResolver {
     }
 
     @Mutation(() => ItemType)
+    async itemfindone(@Args('id') id: string): Promise<ItemInput> {
+        return this.itemsService.findOne(id);
+    }
+
+
+
+    @Mutation(() => ItemType)
     async createItem(@Args('input') input: ItemInput): Promise<ItemInput> {
         return this.itemsService.create(input);
     }

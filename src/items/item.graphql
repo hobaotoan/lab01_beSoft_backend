@@ -1,20 +1,23 @@
 input ItemInput {
-  title: String!
-  price: Int!
-  description: String!
+  username: String!
+  password: String!
+  phone: String!
+  email:String!
 }
 
 type ItemType {
   id: ID!
-  title: String!
-  price: Int!
-  description: String!
+  username: String!
+  password: String!
+  phone: String!
+  email: String!
 }
 
 type Mutation {
   createItem(input: ItemInput!): ItemType!
   updateItem(input: ItemInput!, id: String!): ItemType!
   deleteItem(id: String!): ItemType!
+  itemfindone(id: String!): ItemType!
 }
 
 type Query {
